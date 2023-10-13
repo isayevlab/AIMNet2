@@ -3,7 +3,7 @@ from openbabel import pybel
 import numpy as np
 import re
 import os
-from aimnet2sph import AIMNet2NSECalculator
+from aimnet2sph import AIMNet2Calculator
 from pysisyphus.Geometry import Geometry
 from pysisyphus.elem_data import INV_ATOMIC_NUMBERS
 from pysisyphus.constants import ANG2BOHR
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     print('Loading AIMNet2 model from file', args.model)
     model = torch.jit.load(args.model, map_location=device)
-    calc = AIMNet2NSECalculator(model)
+    calc = AIMNet2Calculator(model)
 
     in_format = guess_pybel_type(args.in_file)
     out_format = guess_pybel_type(args.out_file)

@@ -6,7 +6,7 @@ from openbabel import pybel
 import numpy as np
 import re
 import os
-from aimnet2ase import AIMNet2NSECalculator
+from aimnet2ase import AIMNet2Calculator
 
 
 def optimize(atoms, prec=1e-3, steps=1000, traj=None):
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     print('Loading AIMNet2 model from file', args.model)
     model = torch.jit.load(args.model, map_location=device)
-    calc = AIMNet2NSECalculator(model)
+    calc = AIMNet2Calculator(model)
 
     in_format = guess_pybel_type(args.in_file)
     out_format = guess_pybel_type(args.out_file)

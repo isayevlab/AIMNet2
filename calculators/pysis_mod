@@ -3,9 +3,9 @@
 
 if __name__ == '__main__':
     from pysisyphus import run
-    from aimnet2sph import AIMNet2NSECalculator
+    from aimnet2sph import AIMNet2Calculator
 
-    run.CALC_DICT['aimnet'] = AIMNet2NSECalculator
+    run.CALC_DICT['aimnet'] = AIMNet2Calculator
 
     run.run()
 
