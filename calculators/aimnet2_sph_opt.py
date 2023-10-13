@@ -3,7 +3,7 @@ from openbabel import pybel
 import numpy as np
 import re
 import os
-from aimnet2sph import AIMNet2NSECalculator
+from aimnet2sph import AIMNet2Calculator
 from pysisyphus.Geometry import Geometry
 from pysisyphus.elem_data import INV_ATOMIC_NUMBERS
 from pysisyphus.constants import ANG2BOHR

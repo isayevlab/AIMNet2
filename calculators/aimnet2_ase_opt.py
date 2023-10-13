@@ -6,7 +6,7 @@ from openbabel import pybel
 import numpy as np
 import re
 import os
-from aimnet2ase import AIMNet2NSECalculator
+from aimnet2ase import AIMNet2Calculator
 
 
 def optimize(atoms, prec=1e-3, steps=1000, traj=None):
