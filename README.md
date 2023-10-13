@@ -10,19 +10,19 @@ The repository contains AIMNet2 models, example python code and supplementary da
 ## Models
 
 The models are applicable for systems containing the following set of chemical elements:
-{H, B, C, N, O, F, Si, P, S, Cl, As, Se, Br, I}, both neurtal and charged. The models aim to reproduce RKS B97-3c and wB97M-D3 energies.
+{H, B, C, N, O, F, Si, P, S, Cl, As, Se, Br, I}, both neutral and charged. The models aim to reproduce RKS B97-3c and wB97M-D3 energies.
   
-The models are in form JIT-compiled PyTorch files and could be loaded in Python or C++ code.
+The models are in the form of JIT-compiled PyTorch-2.0 files and could be loaded in Python or C++ code.
 
-Note, that at present models have O(N^2) compute and memory complexity w.r.t. number of atoms. They could be aplpied to systems up to few 100's of atoms. Linear scaling models, with the same parametrization, will be released soon.
+Note, that at present models have O(N^2) compute and memory complexity w.r.t. number of atoms. They could be applied to systems up to a few 100's of atoms. Linear scaling models, with the same parametrization, will be released soon.
 
-In Python, the models could be loaded with the `torch.jit.load` function. As an input, they accept dingle argument of type `Dict[str, Tensor]` with following data:
+In Python, the models could be loaded with the `torch.jit.load` function. As an input, they accept single argument of type `Dict[str, Tensor]` with the following data:
 ```
 coords: shape (m, n, 3) - atomic coordinates in Angstrom 
 numbers: shape (m, n) - atomic numbers
 charge: shape (m, ) - total charge
 ```
-Output is a dictionary with following keys:
+Output is a dictionary with the following keys:
 ```
 energy: shape (m, ) - energy in eV
 charges: shape (m, n) - partial atomic charges
