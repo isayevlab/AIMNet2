@@ -32,3 +32,19 @@ charges: shape (m, n) - partial atomic charges
 We provide example code for AIMNet2 calculators for [ASE](https://wiki.fysik.dtu.dk/ase) and [pysisyphus](https://pysisyphus.readthedocs.io/) Python libraries. The code shows example use of the AIMNet2 models. 
 
 We also provide example geometry optimization scripts with ASE and Pysisyphus, and `pysis_mod` script which is a drop-in replacement for Pysisyphus `pysis` command-line utility, with AIMNet2 calculator enabled.
+
+## Docker image
+
+command for building docker image: 
+
+```bash
+docker build --platform linux/amd64 --pull --rm -f "aimnet_Dockerfile" -t aimnet-box "."
+```
+
+skip platform flag if you are building on linux
+
+command for running docker image:
+
+```bash
+docker run -it --rm -v $(pwd):/app/ aimnet-box aimnet2_ase_opt.py input.sdf output.sdf --charge 0 --traj traj.xyz
+```
