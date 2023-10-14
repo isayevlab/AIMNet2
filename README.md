@@ -35,17 +35,19 @@ We also provide example geometry optimization scripts with ASE and Pysisyphus, a
 
 ## Docker image
 
-command for building docker image: 
+We provide an example Dockerfile to build a CPU docker image.
 
-
+The commands for building docker image: 
 ```bash
+cd docker 
 docker build --platform linux/amd64 --pull --rm -f "Dockerfile_cpu" -t aimnet-box "."
 ```
 
-skip platform flag if you are building on linux
+You might skip the `--platform` flag if you are building on Linux.
 
-this image currently exposes `aimnet2_ase_opt.py` script as entrypoint
-command for running docker image:
+The image exposes `aimnet2_ase_opt.py` script as entrypoint.
+
+Example command to run geometry optimization with docker image:
 
 ```bash
 docker run -it --rm -v $(pwd):/app/ aimnet-box models/aimnet2_wb97m-d3_ens.jpt input.sdf output.sdf --charge 0 --traj traj.xyz
