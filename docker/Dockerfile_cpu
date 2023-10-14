@@ -3,6 +3,6 @@ RUN mamba install -q -y -c conda-forge openbabel
 COPY requirements.txt .
 RUN pip install torch=2.0.0 ase numpy pysisyphus
 WORKDIR /app
-COPY calculators/ calculators/
-COPY models/ models/
+COPY ../calculators/ calculators/
+COPY ../models/ models/
 ENTRYPOINT [ "python3" ,"/app/calculators/aimnet2_ase_opt.py"]
