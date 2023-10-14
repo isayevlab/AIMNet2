@@ -1,7 +1,7 @@
 
 # AIMNet2: a general-purpose neural netrork potential for organic and element-organic molecules.
 
-The repository contains AIMNet2 models, example python code and supplementary data for the manuscript
+The repository contains AIMNet2 models, example Python code and supplementary data for the manuscript
 
 **AIMNet2: A Neural Network Potential to Meet your Neutral, Charged, Organic, and Elemental-Organic Needs**
 *Dylan Anstine ,Roman Zubatyuk ,Olexandr Isayev*
@@ -29,7 +29,7 @@ charges: shape (m, n) - partial atomic charges
 ```
 ## Calculators
 
-We provide example code for AIMNet2 calculators for [ASE](https://wiki.fysik.dtu.dk/ase) and [pysisyphus](https://pysisyphus.readthedocs.io/) Python libraries. The code shows example use of the AIMNet2 models. 
+We provide example code for AIMNet2 calculators for [ASE](https://wiki.fysik.dtu.dk/ase) and [pysisyphus](https://pysisyphus.readthedocs.io/) Python libraries. The code shows an example use of the AIMNet2 models. 
 
 We also provide example geometry optimization scripts with ASE and Pysisyphus, and `pysis_mod` script which is a drop-in replacement for Pysisyphus `pysis` command-line utility, with AIMNet2 calculator enabled.
 
@@ -50,3 +50,9 @@ command for running docker image:
 ```bash
 docker run -it --rm -v $(pwd):/app/ aimnet-box models/aimnet2_wb97m-d3_ens.jpt input.sdf output.sdf --charge 0 --traj traj.xyz
 ```
+=======
+
+### Feedback
+
+We would appreciate it if you could share feedback about model accuracy and performance. This would be important not only for us, to guide further developments of the model, but for the broad community as well. 
+Please share your thoughts and experience, either positive or negative, by opening an issue in this repo.
