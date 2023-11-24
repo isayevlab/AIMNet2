@@ -39,8 +39,8 @@ We provide an example Dockerfile to build a CPU docker image.
 
 The commands for building docker image: 
 ```bash
-cd docker 
-docker build --platform linux/amd64 --pull --rm -f "Dockerfile_cpu" -t aimnet-box "."
+cd /path/to/AIMNet2 
+docker build --platform linux/amd64 --pull --rm -f "docker/Dockerfile_cpu" -t aimnet-box "."
 ```
 
 You might skip the `--platform` flag if you are building on Linux.
