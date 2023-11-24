@@ -5,7 +5,7 @@
 #   -full (flag): If present, perform a full setup.
 
 main() {
-    root=$1
+    root=$(realpath "$1")
     full=false
 
     # Check for '-full' flag
