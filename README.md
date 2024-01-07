@@ -39,8 +39,8 @@ We provide an example Dockerfile to build a CPU docker image.
 
 The commands for building docker image: 
 ```bash
-cd docker 
-docker build --platform linux/amd64 --pull --rm -f "Dockerfile_cpu" -t aimnet-box "."
+cd /path/to/AIMNet2 
+docker build --platform linux/amd64 --pull --rm -f "docker/Dockerfile_cpu" -t aimnet-box "."
 ```
 
 You might skip the `--platform` flag if you are building on Linux.
@@ -50,8 +50,10 @@ The image exposes `aimnet2_ase_opt.py` script as entrypoint.
 Example command to run geometry optimization with docker image:
 
 ```bash
-docker run -it --rm -v $(pwd):/app/ aimnet-box models/aimnet2_wb97m-d3_ens.jpt input.sdf output.sdf --charge 0 --traj traj.xyz
+docker run -it --rm -v $(pwd):/app/ aimnet-box models/aimnet2_wb97m-d3_ens.jpt input.sdf output.sdf --charge 0 --traj output.traj
 ```
+
+Use `ase convert output.traj output.xyz` for conversion to e.g. `xyz` file format.
 =======
 
 ### Feedback
