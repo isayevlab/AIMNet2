@@ -1,5 +1,5 @@
 
-# AIMNet2: a general-purpose neural netrork potential for organic and element-organic molecules.
+# AIMNet2: a general-purpose neural network potential for organic and element-organic molecules.
 
 The repository contains AIMNet2 models, example Python code and supplementary data for the manuscript
 
