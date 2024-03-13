@@ -20,7 +20,11 @@ def test_missing_models():
 
 
 @pytest.mark.parametrize(
-    "model, expected_energy", [pytest.param("wb97m-d3", -2081.0415), pytest.param("b973c", -2078.9055)]
+    "model, expected_energy",
+    [
+        pytest.param("wb97m-d3", -2081.0415, id="wb97m-d3"),
+        pytest.param("b973c", -2078.9055, id="b973c"),
+    ],
 )
 def test_model_energies(model, expected_energy, water):
     """Test the energies calculated for a water molecule match the expected values."""

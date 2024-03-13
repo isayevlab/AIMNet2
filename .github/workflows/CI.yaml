@@ -44,4 +44,4 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --color=yes pyaimnet/tests/
+        pytest -v --color=yes pyaimnet2/tests/

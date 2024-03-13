@@ -23,6 +23,9 @@ version = {attr = "pyaimnet2.__version__"}
 namespaces = true
 where = ["."]
 
+[tool.setuptools.package-data]
+
+
 [tool.versioneer]
 VCS = "git"
 style = "pep440"
