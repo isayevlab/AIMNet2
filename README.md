@@ -52,14 +52,17 @@ pip install .
 
 ## Loading models via python
 The aimnet2 package provides a convenience function to load the ensemble models
+
 ```python
-from aimnet2 import load_model
-model = load_model("wb97m-d3") # can also load b973c
+from pyaimnet2 import load_model
+
+model = load_model("wb97m-d3")  # can also load b973c
 ```
 the model can then be used by providing the inputs as described in [Models](#models) or used with one of the provided 
 calculators like ASE
+
 ```python
-from aimnet2.calculators.aimnet2ase import AIMNet2Calculator
+from pyaimnet2.calculators.aimnet2ase import AIMNet2Calculator
 
 calculator = AIMNet2Calculator(model=model)
 ```

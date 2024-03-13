@@ -27,7 +27,7 @@ def update_mol(mol, atoms, align=True):
     mol_old = pybel.Molecule(pybel.ob.OBMol(mol.OBMol))
     # update coord
     for i, c in enumerate(atoms.get_positions()):
-        mol.OBMol.GetAtom(i+1).SetVector(*c.tolist())
+        mol.OBMol.GetAtom(i + 1).SetVector(*c.tolist())
     # align
     if align:
         aligner = pybel.ob.OBAlign(False, False)
@@ -36,16 +36,16 @@ def update_mol(mol, atoms, align=True):
         aligner.Align()
         rmsd = aligner.GetRMSD()
         aligner.UpdateCoords(mol.OBMol)
-        print(f'RMSD: {rmsd:.2f} Angs')
+        print(f"RMSD: {rmsd:.2f} Angs")
 
 
 def guess_pybel_type(filename):
-    assert '.' in filename
+    assert "." in filename
     return os.path.splitext(filename)[1][1:]
 
 
 def guess_charge(mol):
-    m = re.search('charge: (-?\d+)', mol.title)
+    m = re.search("charge: (-?\d+)", mol.title)
     if m:
         charge = int(m.group(1))
     else:
@@ -53,31 +53,38 @@ def guess_charge(mol):
     return charge
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--charge', type=int, default=None, help='Molecular charge (default: check molecule title for "charge: {int}" or get total charge from OpenBabel).')
-    parser.add_argument('--traj', help='Trajectory file', type=str, default=None)
-    parser.add_argument('--fmax', type=float, default=5e-3, help='Optimization threshold.')
-    parser.add_argument('model')
-    parser.add_argument('in_file')
-    parser.add_argument('out_file')
+    parser.add_argument(
+        "--charge",
+        type=int,
+        default=None,
+        help='Molecular charge (default: check molecule title for "charge: {int}" or get total charge from OpenBabel).',
+    )
+    parser.add_argument("--traj", help="Trajectory file", type=str, default=None)
+    parser.add_argument(
+        "--fmax", type=float, default=5e-3, help="Optimization threshold."
+    )
+    parser.add_argument("model")
+    parser.add_argument("in_file")
+    parser.add_argument("out_file")
     args = parser.parse_args()
 
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    print('Loading AIMNet2 model from file', args.model)
+    print("Loading AIMNet2 model from file", args.model)
     model = torch.jit.load(args.model, map_location=device)
     calc = AIMNet2Calculator(model)
 
     in_format = guess_pybel_type(args.in_file)
     out_format = guess_pybel_type(args.out_file)
 
-    with open(args.out_file, 'w') as f:
+    with open(args.out_file, "w") as f:
         for mol in pybel.readfile(in_format, args.in_file):
             atoms = pybel2atoms(mol)
             charge = args.charge if args.charge is not None else guess_charge(mol)

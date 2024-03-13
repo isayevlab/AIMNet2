@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel", "versioneer"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aimnet2"
+name = "pyaimnet2"
 description = "AIMNet2: a general-purpose neural network potential for organic and element-organic molecules."
 authors = [ {name = "Dylan Anstine ,Roman Zubatyuk ,Olexandr Isayev"} ]
 license = { text = "MIT" }
@@ -17,7 +17,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.dynamic]
-version = {attr = "aimnet2.__version__"}
+version = {attr = "pyaimnet2.__version__"}
 
 [tool.setuptools.packages.find]
 namespaces = true
@@ -26,10 +26,10 @@ where = ["."]
 [tool.versioneer]
 VCS = "git"
 style = "pep440"
-versionfile_source = "aimnet2/_version.py"
-versionfile_build = "aimnet2/_version.py"
+versionfile_source = "pyaimnet2/_version.py"
+versionfile_build = "pyaimnet2/_version.py"
 tag_prefix = ""
-parentdir_prefix = "aimnet2-"
+parentdir_prefix = "pyaimnet2-"
 
 [tool.black]
 line-length = 88

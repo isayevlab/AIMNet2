@@ -4,9 +4,15 @@ from typing import Dict, List
 
 
 class EnsembledModel(nn.Module):
-    """ Create ensemble of AIMNet2 models.
-    """
-    def __init__(self, models: List, x=['coord', 'numbers', 'charge'], out=['energy', 'forces', 'charges'], detach=True):
+    """Create ensemble of AIMNet2 models."""
+
+    def __init__(
+        self,
+        models: List,
+        x=["coord", "numbers", "charge"],
+        out=["energy", "forces", "charges"],
+        detach=True,
+    ):
         super().__init__()
         self.models = nn.ModuleList(models)
         self.x = x
@@ -14,7 +20,7 @@ class EnsembledModel(nn.Module):
         self.detach = detach
 
     def forward(self, data: Dict[str, Tensor]) -> Dict[str, Tensor]:
-        res : List[Dict[str, Tensor]] = []
+        res: List[Dict[str, Tensor]] = []
         for model in self.models:
             _in = dict()
             for k in data:
@@ -35,6 +41,6 @@ class EnsembledModel(nn.Module):
                 v.append(x[k])
             vv = torch.stack(v, dim=0)
             data[k] = vv.mean(dim=0)
-            data[k + '_std'] = vv.std(dim=0)
+            data[k + "_std"] = vv.std(dim=0)
 
         return data
