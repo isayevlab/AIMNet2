@@ -27,6 +27,47 @@ Output is a dictionary with the following keys:
 energy: shape (m, ) - energy in eV
 charges: shape (m, n) - partial atomic charges
 ```
+
+## Installation
+To make accessing the models simpler this package can be installed into a python environment. It is recommended that you
+create a new conda environment with the required dependencies to run the AIMNET2 model and provided calculator interfaces.
+ You can create the environment using the following command
+```bash
+mamba create -n aimnet2 -c conda-forge 'pytorch=2' numpy ase
+```
+you should then activate the environment using
+```bash
+conda activate aimnet2
+```
+to use the `pysisyphus` calculator you will need to install the package from PyPI using pip
+```bash
+pip install pysisyphus
+```
+you should then clone this package and install from source via
+```bash
+git clone https://github.com/isayevlab/AIMNet2.git
+cd AIMNet2
+pip install . 
+```
+
+## Loading models via python
+The aimnet2 package provides a convenience function to load the ensemble models
+
+```python
+from pyaimnet2 import load_model
+
+model = load_model("wb97m-d3")  # can also load b973c
+```
+the model can then be used by providing the inputs as described in [Models](#models) or used with one of the provided 
+calculators like ASE
+
+```python
+from pyaimnet2.calculators.aimnet2ase import AIMNet2Calculator
+
+calculator = AIMNet2Calculator(model=model)
+```
+
+
 ## Calculators
 
 We provide example code for AIMNet2 calculators for [ASE](https://wiki.fysik.dtu.dk/ase) and [pysisyphus](https://pysisyphus.readthedocs.io/) Python libraries. The code shows an example use of the AIMNet2 models. 

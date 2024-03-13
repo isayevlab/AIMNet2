@@ -1,0 +1,12 @@
+name: pyaminet2
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - ase
+  - numpy
+  - pytorch==2.0.0
+
+  # testing
+  - pytest
