@@ -1,0 +1,108 @@
+#------------------------------------------------------------------------------
+#$Date: 2023-03-26 11:09:57 +0300 (Sun, 26 Mar 2023) $
+#$Revision: 282068 $
+#$URL: file:///home/coder/svn-repositories/cod/cif/1/00/87/1008775.cif $
+#------------------------------------------------------------------------------
+#
+# This file is available in the Crystallography Open Database (COD),
+# http://www.crystallography.net/
+#
+# All data on this site have been placed in the public domain by the
+# contributors.
+#
+data_1008775
+loop_
+_publ_author_name
+'Guth, H'
+'Heger, G'
+'Klein, S'
+'Treutmann, W'
+'Scheringer, C'
+_publ_section_title
+;
+Strukturverfeinerung von Harnstoff mit Neutronenbeugungsdaten bei 60,
+123, 293 K und X-N- und X-X (1S2)-Synthesen bei etwa 100 K
+;
+_journal_coden_ASTM              ZEKRDZ
+_journal_name_full
+;
+Zeitschrift fuer Kristallographie (149,1979-)
+;
+_journal_page_first              237
+_journal_page_last               254
+_journal_volume                  153
+_journal_year                    1980
+_chemical_compound_source        'synthetic from solution'
+_chemical_formula_structural     'C O (N H2)2'
+_chemical_formula_sum            'C H4 N2 O'
+_chemical_name_mineral           Urea
+_chemical_name_systematic        Urea
+_space_group_IT_number           113
+_symmetry_cell_setting           tetragonal
+_symmetry_Int_Tables_number      113
+_symmetry_space_group_name_Hall  'P -4 2ab'
+_symmetry_space_group_name_H-M   'P -4 21 m'
+_cell_angle_alpha                90
+_cell_angle_beta                 90
+_cell_angle_gamma                90
+_cell_formula_units_Z            2
+_cell_length_a                   5.576
+_cell_length_b                   5.576
+_cell_length_c                   4.692
+_cell_volume                     145.9
+_database_code_amcsd             0010831
+_diffrn_ambient_temperature      100
+_exptl_crystal_density_diffrn    1.367
+_cod_original_formula_sum        'H4 N2 O'
+_cod_database_code               1008775
+loop_
+_space_group_symop_operation_xyz
+x,y,z
+1/2-x,1/2+y,-z
+-x,-y,z
+1/2+x,1/2-y,-z
+-y,x,-z
+1/2+y,1/2+x,z
+y,-x,-z
+1/2-y,1/2-x,z
+loop_
+_atom_site_aniso_label
+_atom_site_aniso_U_11
+_atom_site_aniso_U_12
+_atom_site_aniso_U_13
+_atom_site_aniso_U_22
+_atom_site_aniso_U_23
+_atom_site_aniso_U_33
+C1 0.0127 0.0006 0. 0.0127 0. 0.0056
+O1 0.0161 0.0015 0. 0.0161 0. 0.0052
+N1 0.0244 -0.0118 0.0001 0.0244 0.0001 0.0082
+H1 0.0403 -0.0192 -0.0022 0.0403 -0.0022 0.0256
+H2 0.0403 -0.0132 0.0021 0.0403 0.0021 0.0153
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_symmetry_multiplicity
+_atom_site_Wyckoff_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_attached_hydrogens
+_atom_site_calc_flag
+C1 C4+ 2 c 0. 0.5 0.329 1. 0 d
+O1 O2- 2 c 0. 0.5 0.597 1. 0 d
+N1 N3- 4 e 0.1455 0.6455 0.1791 1. 0 d
+H1 H1+ 4 e 0.2561 0.7561 0.2855 1. 0 d
+H2 H1+ 4 e 0.1429 0.6429 -0.037 1. 0 d
+loop_
+_atom_type_symbol
+_atom_type_oxidation_number
+C4+ 4.000
+O2- -2.000
+N3- -3.000
+H1+ 1.000
+loop_
+_cod_related_entry_id
+_cod_related_entry_database
+_cod_related_entry_code
+1 AMCSD 0010831
