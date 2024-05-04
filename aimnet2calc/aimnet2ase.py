@@ -6,7 +6,7 @@ import torch
 
 class AIMNet2ASE(Calculator):
     implemented_properties = ['energy', 'forces', 'free_energy', 'charges', 'stress']
-    def __init__(self, base_calc: Union[AIMNet2Calculator, str], charge=0, mult=1):
+    def __init__(self, base_calc: Union[AIMNet2Calculator, str] = 'aimnet2', charge=0, mult=1):
         super().__init__()
         if isinstance(base_calc, str):
             base_calc = AIMNet2Calculator(base_calc)
