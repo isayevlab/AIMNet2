@@ -26,7 +26,7 @@ class AIMNet2Calculator:
         'shifts_lr': torch.float,
         'cell': torch.float
         }
-    keys_out = ['energy', 'charges', 'forces']
+    keys_out = ['energy', 'charges', 'forces', 'hessian', 'stress']
     atom_feature_keys = ['coord', 'numbers', 'charges', 'forces']
     
     def __init__(self, model: Union[str, torch.nn.Module] = 'aimnet2'):
@@ -182,7 +182,7 @@ class AIMNet2Calculator:
             self._saved_for_grad['coord'] = data['coord']
         if stress:
             assert 'cell' in data, 'Stress calculation requires cell'
-            scaling = torch.eye(3, requires_grad=True, dtype=data['cell'].dtype, device=data['cell'].dtype)
+            scaling = torch.eye(3, requires_grad=True, dtype=data['cell'].dtype, device=data['cell'].device)
             data['coord'] = data['coord'] @ scaling
             data['cell'] = data['cell'] @ scaling
             self._saved_for_grad['scaling'] = scaling
