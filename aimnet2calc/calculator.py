@@ -10,8 +10,22 @@ class AIMNet2Calculator:
     A helper class to load AIMNet2 models and perform inference.
     """
 
-    keys_in = ['coord', 'numbers', 'charge']
-    keys_in_optional = ['mult', 'mol_idx', 'nbmat', 'nbmat_lr', 'nb_pad_mask', 'nb_pad_mask_lr', 'shifts', 'cell']
+    keys_in = {
+        'coord': torch.float,
+        'numbers': torch.int,
+        'charge': torch.float
+        }
+    keys_in_optional = {
+        'mult': torch.float,
+        'mol_idx': torch.int,
+        'nbmat': torch.int,
+        'nbmat_lr': torch.int,
+        'nb_pad_mask': torch.bool,
+        'nb_pad_mask_lr': torch.bool,
+        'shifts': torch.float,
+        'shifts_lr': torch.float,
+        'cell': torch.float
+        }
     keys_out = ['energy', 'charges', 'forces']
     atom_feature_keys = ['coord', 'numbers', 'charges', 'forces']
     
@@ -31,10 +45,31 @@ class AIMNet2Calculator:
 
         # indicator if input was flattened
         self._batch = None
+        # placeholder for tensors that require grad
         self._saved_for_grad = None
+        # set flag of current Coulomb model
+        coul_methods = set(getattr(mod, 'method', None) for mod in iter_lrcoulomb_mods(self.model))
+        assert len(coul_methods) == 1, 'Multiple Coulomb methods found.'
+        self._coulomb_method = coul_methods.pop()
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args, **kwargs)
+
+    def set_lrcoulomb_method(self, method, dsf_cutoff=15.0, dsf_alpha=0.2):
+        assert method in ('simple', 'dsf', 'ewald'), f'Invalid method: {method}'
+        if method == 'simple':
+            for mod in iter_lrcoulomb_mods(self.model):
+                mod.method = 'simple'
+                self.cutoff_lr = float('inf')
+        elif method == 'dsf':
+            for mod in iter_lrcoulomb_mods(self.model):
+                mod.method = 'dsf'
+                self.cutoff_lr = dsf_cutoff
+                mod.dsf_alpha = dsf_alpha
+        elif method == 'ewald':
+            for mod in iter_lrcoulomb_mods(self.model):
+                mod.method = 'ewald'
+        self._coulomb_method = method
 
     def eval(self, data: Dict[str, Any], forces=False, stress=False, hessian=False) -> Dict[str, Tensor]:
         data = self.prepare_input(data)
@@ -50,8 +85,12 @@ class AIMNet2Calculator:
     def prepare_input(self, data: Dict[str, Any]) -> Dict[str, Tensor]:
         data = self.to_input_tensors(data)
         data = self.mol_flatten(data)
-        if 'cell' in data and data['cell'] is not None and data['mol_idx'][-1] > 0:
-            raise NotImplementedError('PBC with multiple molecules is not supported')
+        if data.get('cell') is not None:
+            if data['mol_idx'][-1] > 0:
+                raise NotImplementedError('PBC with multiple molecules is not implemented yet.')
+            if self._coulomb_method == 'simple':
+                print('Switching to DSF Coulomb for PBC')
+                self.set_lrcoulomb_method('dsf')
         data = self.make_nbmat(data)
         data = self.pad_input(data)
         return data
@@ -67,10 +106,10 @@ class AIMNet2Calculator:
         for k in self.keys_in:
             assert k in data, f'Missing key {k} in the input data'
             # always detach !!
-            ret[k] = torch.as_tensor(data[k], device=self.device).detach()
+            ret[k] = torch.as_tensor(data[k], device=self.device, dtype=self.keys_in[k]).detach()
         for k in self.keys_in_optional:
             if k in data and data[k] is not None:
-                ret[k] = torch.as_tensor(data[k], device=self.device).detach()
+                ret[k] = torch.as_tensor(data[k], device=self.device, dtype=self.keys_in_optional[k]).detach()
         # convert any scalar tensors to shape (1,) tensors
         for k, v in ret.items():
             if v.ndim == 0:
@@ -112,12 +151,14 @@ class AIMNet2Calculator:
                     if 'nbmat_lr' not in data:
                         assert self.cutoff_lr < torch.inf, 'Long-range cutoff must be finite for PBC'
                         data['nbmat_lr'], data['nb_pad_mask_lr'], data['shifts_lr'] = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff_lr)
+                        data['cutoff_lr'] = torch.tensor(self.cutoff_lr, device=self.device)
         else:
             if 'nbmat' not in data:
                 data['nbmat'] = nblist_torch_cluster(data['coord'], self.cutoff, data['mol_idx'], max_nb=128)
                 if self.lr:
                     if 'nbmat_lr' not in data:
                         data['nbmat_lr'] = nblist_torch_cluster(data['coord'], self.cutoff_lr, data['mol_idx'], max_nb=1024)
+                    data['cutoff_lr'] = torch.tensor(self.cutoff_lr, device=self.device)
         return data
     
     def pad_input(self, data: Dict[str, Tensor]) -> Dict[str, Tensor]:
@@ -223,7 +264,7 @@ def _named_children_rec(module):
             yield from _named_children_rec(module)
 
 
-def set_lrcoulomb_method(model, method):
+def iter_lrcoulomb_mods(model):
     for name, module in _named_children_rec(model):
         if name == 'lrcoulomb':
-            module.set_method(method)
+            yield module

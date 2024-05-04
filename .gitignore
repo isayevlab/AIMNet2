@@ -1,0 +1,40 @@
+# vscode history
+.history/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+env.bak/
+env1/
+env2/
+.env
+
+# IDE
+.vscode/
+*.code-workspace
+
+# Logs
+*.log
+
+# Build
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Tests
+test-reports/
+.coverage
+
+# Miscellaneous
+*.bak
+*.swp
+*.tmp
+*.tmp.*
+*~
