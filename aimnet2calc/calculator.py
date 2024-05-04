@@ -76,7 +76,7 @@ class AIMNet2Calculator:
         if hessian and data['mol_idx'][-1] > 0:
             raise NotImplementedError('Hessian calculation is not supported for multiple molecules')
         data = self.set_grad_tensors(data, forces=forces, stress=stress, hessian=hessian)
-        with torch.jit.optimized_execution(True):
+        with torch.jit.optimized_execution(False):
             data = self.model(data)
         data = self.get_derivatives(data, forces=forces, stress=stress, hessian=hessian)
         data = self.process_output(data)
