@@ -3,13 +3,9 @@ import requests
 
 # model registry aliases
 model_registry_aliases = {}
-model_registry_aliases['aimnet2'] = 'aimnet2_wb97m_0_240428'
+model_registry_aliases['aimnet2'] = 'aimnet2_wb97m_0'
 model_registry_aliases['aimnet2_wb97m'] = model_registry_aliases['aimnet2']
-model_registry_aliases['aimnet2_wb97m_ens'] = 'aimnet2_wb97m_ens_240428'
-model_registry_aliases['aimnet2_ens'] = model_registry_aliases['aimnet2_wb97m_ens']
-model_registry_aliases['aimnet2_b973c'] = 'aimnet2_b973c_0_240428'
-model_registry_aliases['aimnet2_b973c_ens'] = 'aimnet2_b973c_ens_240428'
-model_registry_aliases['aimnet2_qr'] = 'aimnet2_qr_b97m_qzvp'
+model_registry_aliases['aimnet2_b973c'] = 'aimnet2_b973c_0'
 
 
 def get_model_path(s: str):
