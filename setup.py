@@ -9,7 +9,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'torch>2.0,<3',
-        'torch_cluster',
+        'torch-cluster',
         'numpy',
         'numba',
         'ase',

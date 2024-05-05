@@ -5,7 +5,7 @@ This package integrates the powerful AIMNet2 neural network potential into your 
 ## Key Features:
 
 - **Accurate and Versatile:** AIMNet2 excels at modeling neutral, charged, organic, and elemental-organic systems.
-- **Flexible Interfaces:** Use AIMNet2 through convenient calculators for popular simulation packages like ASE and PySisiphus.
+- **Flexible Interfaces:** Use AIMNet2 through convenient calculators for popular simulation packages like ASE and PySisyphus.
 - **Flexible Long-Range Interactions:** Optionally employ the Dumped-Shifted Force (DSF) or Ewald summation Coulomb models for accurate calculations in large or periodic systems.
 
 
@@ -13,8 +13,17 @@ This package integrates the powerful AIMNet2 neural network potential into your 
 
 ### 1. Installation
 
-While package is in alpha stage and repository is private, please install manually with
+While package is in alpha stage and repository is private, please install into your conda envoronment manually with
 ```
+# install requirements
+conda install -y pytorch pytorch-cuda=12.1 -c pytorch -c nvidia 
+conda install -y -c pyg pytorch-cluster
+conda install -y -c conda-forge openbabel ase
+## pysis requirwements
+conda install -y -c conda-forge autograd dask distributed h5py fabric jinja2 joblib matplotlib numpy natsort psutil pyyaml rmsd scipy sympy scikit-learn
+# now should not do any pip installs
+pip install git+https://github.com/eljost/pysisyphus.git
+# finally, this repo
 git clone git@github.com:zubatyuk/aimnet2calc.git
 cd aimnet2calc
 python setup.py install
@@ -41,17 +50,17 @@ calc.set_charge(-2)
 # calculations on atoms1 will be done with charge -2
 ```
 
-#### PySisiphus [[https://pysisyphus.readthedocs.io]](https://pysisyphus.readthedocs.io/)
+#### PySisyphus [[https://pysisyphus.readthedocs.io]](https://pysisyphus.readthedocs.io/)
 
 ```
-from aimnet2calc import AIMNet2Pysis
-calc = AIMNet2Pysis('aimnet2')
+from aimnet2calc import AIMNet2PySis
+calc = AIMNet2PySis('aimnet2')
 ```
 
-This produces standard PySisiphus calculator.
+This produces standard PySisyphus calculator.
 
-Instead of `pysis` command line utility, use `aimnet2pysis`. This registeres AIMNet2 calculator with PySisiphus.
-Example `calc` section for PySisiphus YAML files:
+Instead of `Pysis` command line utility, use `aimnet2Pysis`. This registeres AIMNet2 calculator with PySisyphus.
+Example `calc` section for PySisyphus YAML files:
 
 ```
 calc:
