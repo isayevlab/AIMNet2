@@ -1,6 +1,6 @@
 calc:
   type: aimnet
-  base_calc: aimnet2_b973c
+  model: aimnet2_b973c
 
 geom:
   type: dlc
