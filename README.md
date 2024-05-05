@@ -19,7 +19,7 @@ While package is in alpha stage and repository is private, please install into y
 conda install -y pytorch pytorch-cuda=12.1 -c pytorch -c nvidia 
 conda install -y -c pyg pytorch-cluster
 conda install -y -c conda-forge openbabel ase
-## pysis requirwements
+## pysis requirements
 conda install -y -c conda-forge autograd dask distributed h5py fabric jinja2 joblib matplotlib numpy natsort psutil pyyaml rmsd scipy sympy scikit-learn
 # now should not do any pip installs
 pip install git+https://github.com/eljost/pysisyphus.git
@@ -59,7 +59,7 @@ calc = AIMNet2PySis('aimnet2')
 
 This produces standard PySisyphus calculator.
 
-Instead of `Pysis` command line utility, use `aimnet2Pysis`. This registeres AIMNet2 calculator with PySisyphus.
+Instead of `Pysis` command line utility, use `aimnet2pysis`. This registeres AIMNet2 calculator with PySisyphus.
 Example `calc` section for PySisyphus YAML files:
 
 ```
@@ -95,8 +95,8 @@ The input could be for a single molecule (dict keys and shapes):
 ```
 coord: (B, N, 3)  # atomic coordinates in Angstrom
 numbers (B, N)    # atomic numbers
-charge (N,)       # molecular charge
-mult (N,)         # spin multiplicity, optional
+charge (B,)       # molecular charge
+mult (B,)         # spin multiplicity, optional
 ```
 
 or for a concatenation of molecules:
@@ -106,7 +106,7 @@ coord: (N, 3)  # atomic coordinates in Angstrom
 numbers (N,)    # atomic numbers
 charge (B,)    # molecular charge
 mult (B,)      # spin multiplicity, optional
-mol_idx (N,)   # molecule index for each atom, should contain integers in increasing order.
+mol_idx (N,)   # molecule index for each atom, should contain integers in increasing order, with (B-1) is the maximum number.
 ```
 
 where `B` is the number of molecules, `N` is number of atoms. 
