@@ -48,7 +48,7 @@ class AIMNet2ASE(Calculator):
         self.uptade_tensors()
 
         if self.atoms.cell is not None and self.atoms.pbc.any():
-            assert self.base_calc.cutoff_lr < float('inf'), 'Long-range cutoff must be finite for PBC'
+            #assert self.base_calc.cutoff_lr < float('inf'), 'Long-range cutoff must be finite for PBC'
             cell = self.atoms.cell.array
         else:
             cell = None

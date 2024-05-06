@@ -49,8 +49,11 @@ class AIMNet2Calculator:
         self._saved_for_grad = None
         # set flag of current Coulomb model
         coul_methods = set(getattr(mod, 'method', None) for mod in iter_lrcoulomb_mods(self.model))
-        assert len(coul_methods) == 1, 'Multiple Coulomb methods found.'
-        self._coulomb_method = coul_methods.pop()
+        assert len(coul_methods) <= 1, 'Multiple Coulomb methods found.'
+        if len(coul_methods):
+            self._coulomb_method = coul_methods.pop()
+        else:
+            self._coulomb_method = None
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args, **kwargs)
