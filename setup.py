@@ -13,7 +13,7 @@ setup(
         'numpy',
         'numba',
         'ase',
-        'pysisyphus',
+        # 'pysisyphus',
         'requests',
         # 'openbabel'
     ],
