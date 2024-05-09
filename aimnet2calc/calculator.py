@@ -271,3 +271,4 @@ def iter_lrcoulomb_mods(model):
     for name, module in _named_children_rec(model):
         if name == 'lrcoulomb':
             yield module
+

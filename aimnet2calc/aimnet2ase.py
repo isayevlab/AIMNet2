@@ -2,6 +2,7 @@ from ase.calculators.calculator import Calculator, all_changes
 from aimnet2calc import AIMNet2Calculator
 from typing import Union
 import torch
+import numpy as np
 
 
 class AIMNet2ASE(Calculator):
@@ -14,6 +15,12 @@ class AIMNet2ASE(Calculator):
         self.charge = charge
         self.mult = mult
         self.do_reset()
+        # list of implemented species
+        if hasattr(base_calc, 'implemented_species'):
+            self.implemented_species = base_calc.implemented_species.cpu().numpy()
+        else:
+            self.implemented_species = None
+        
 
     def do_reset(self):
         self._t_numbers = None
@@ -24,6 +31,8 @@ class AIMNet2ASE(Calculator):
         self.mult = 1.0
 
     def set_atoms(self, atoms):
+        if self.implemented_species is not None and not np.in1d(atoms.numbers, self.implemented_species).all():
+            raise ValueError('Some species are not implemented in the AIMNet2Calculator')
         self.atoms = atoms
         self.do_reset()
 
