@@ -125,9 +125,9 @@ results = calc(data, forces=False, stress=False, hessian=False)
 By default, Coulomb energy is calculated in O(N^2) manner, e.g. pair interaction between every pair of atoms in system. For very large or periodic systems, O(N) Dumped-Shifted Force Coulomb model could be employed [doi: 10.1063/1.2206581](https://doi.org/10.1063/1.2206581). With `AIMNetCalculator` interface, switch between standard and DSF Coulomb implementations im AIMNet2 models:
 
 ```
-# switch to O(N^2)
-calc.set_lrcoulomb_method('sdf', dsf_cutoff=15.0, dsf_alpha=0.2)
 # switch to O(N)
+calc.set_lrcoulomb_method('sdf', dsf_cutoff=15.0, dsf_alpha=0.2)
+# switch to O(N^2), not suitable for PBC
 calc.set_lrcoulomb_method('simple')
 ```
 
