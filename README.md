@@ -71,18 +71,18 @@ calc:
 ### 3. Base calculator
 
 ```
-from aimnet2calc import AIMNetCalculator
+from aimnet2calc import AIMNet2Calculator
 ```
 
 #### Initialization
 
 ```
-calc = AIMNetCalculator('aimnet2')
+calc = AIMNet2Calculator('aimnet2')
 ```
 will load default AIMNet2 model aimnet2_wb97m_0.jpt as defined at `aimnet2calc/models.py` . If file does not exist on the machine, it will be downloaded from [aimnet-model-zoo](http://github.com/zubatyuk/aimnet-model-zoo) repository.
 
 ```
-calc = AIMNetCalculator('/path/to_a/model.jpt')
+calc = AIMNet2Calculator('/path/to_a/model.jpt')
 ```
 will load model from the file. 
 
@@ -122,7 +122,7 @@ results = calc(data, forces=False, stress=False, hessian=False)
 
 ### 4. Long range Coulomb model
 
-By default, Coulomb energy is calculated in O(N^2) manner, e.g. pair interaction between every pair of atoms in system. For very large or periodic systems, O(N) Dumped-Shifted Force Coulomb model could be employed [doi: 10.1063/1.2206581](https://doi.org/10.1063/1.2206581). With `AIMNetCalculator` interface, switch between standard and DSF Coulomb implementations im AIMNet2 models:
+By default, Coulomb energy is calculated in O(N^2) manner, e.g. pair interaction between every pair of atoms in system. For very large or periodic systems, O(N) Dumped-Shifted Force Coulomb model could be employed [doi: 10.1063/1.2206581](https://doi.org/10.1063/1.2206581). With `AIMNet2Calculator` interface, switch between standard and DSF Coulomb implementations im AIMNet2 models:
 
 ```
 # switch to O(N)
