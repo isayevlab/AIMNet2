@@ -126,7 +126,7 @@ By default, Coulomb energy is calculated in O(N^2) manner, e.g. pair interaction
 
 ```
 # switch to O(N)
-calc.set_lrcoulomb_method('sdf', dsf_cutoff=15.0, dsf_alpha=0.2)
+calc.set_lrcoulomb_method('dsf', cutoff=15.0, dsf_alpha=0.2)
 # switch to O(N^2), not suitable for PBC
 calc.set_lrcoulomb_method('simple')
 ```

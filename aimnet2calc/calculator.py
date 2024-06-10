@@ -49,7 +49,7 @@ class AIMNet2Calculator:
         self._saved_for_grad = None
         # set flag of current Coulomb model
         coul_methods = set(getattr(mod, 'method', None) for mod in iter_lrcoulomb_mods(self.model))
-        assert len(coul_methods) <= 1, 'Multiple Coulomb methods found.'
+        assert len(coul_methods) <= 1, 'Multiple Coulomb modules found.'
         if len(coul_methods):
             self._coulomb_method = coul_methods.pop()
         else:
@@ -58,7 +58,7 @@ class AIMNet2Calculator:
     def __call__(self, *args, **kwargs):
         return self.eval(*args, **kwargs)
 
-    def set_lrcoulomb_method(self, method, dsf_cutoff=15.0, dsf_alpha=0.2):
+    def set_lrcoulomb_method(self, method, cutoff=15.0, dsf_alpha=0.2):
         assert method in ('simple', 'dsf', 'ewald'), f'Invalid method: {method}'
         if method == 'simple':
             for mod in iter_lrcoulomb_mods(self.model):
@@ -67,11 +67,12 @@ class AIMNet2Calculator:
         elif method == 'dsf':
             for mod in iter_lrcoulomb_mods(self.model):
                 mod.method = 'dsf'
-                self.cutoff_lr = dsf_cutoff
+                self.cutoff_lr = cutoff
                 mod.dsf_alpha = dsf_alpha
         elif method == 'ewald':
             for mod in iter_lrcoulomb_mods(self.model):
                 mod.method = 'ewald'
+                self.cutoff_lr = cutoff
         self._coulomb_method = method
 
     def eval(self, data: Dict[str, Any], forces=False, stress=False, hessian=False) -> Dict[str, Tensor]:
