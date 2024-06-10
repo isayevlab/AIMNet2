@@ -1,8 +1,0 @@
-FROM condaforge/mambaforge:latest
-RUN mamba install -q -y -c conda-forge openbabel
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-WORKDIR /app
-COPY ../calculators/ calculators/
-COPY ../models/ models/
-ENTRYPOINT [ "python3" ,"/app/calculators/aimnet2_ase_opt.py"]
