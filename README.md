@@ -1,63 +1,136 @@
+# AIMNet2 Calculator: Fast, Accurate Molecular Simulations
 
-# AIMNet2: a general-purpose neural network potential for organic and element-organic molecules.
+This package integrates the powerful AIMNet2 neural network potential into your simulation workflows. AIMNet2 provides fast and reliable energy, force, and property calculations for molecules containing a diverse range of elements.
 
-The repository contains AIMNet2 models, example Python code and supplementary data for the manuscript
+## Key Features:
 
-**AIMNet2: A Neural Network Potential to Meet your Neutral, Charged, Organic, and Elemental-Organic Needs**
-*Dylan Anstine ,Roman Zubatyuk ,Olexandr Isayev*
-[10.26434/chemrxiv-2023-296ch](https://doi.org/10.26434/chemrxiv-2023-296ch)
-  
-## Models
+- **Accurate and Versatile:** AIMNet2 excels at modeling neutral, charged, organic, and elemental-organic systems.
+- **Flexible Interfaces:** Use AIMNet2 through convenient calculators for popular simulation packages like ASE and PySisyphus.
+- **Flexible Long-Range Interactions:** Optionally employ the Dumped-Shifted Force (DSF) or Ewald summation Coulomb models for accurate calculations in large or periodic systems.
 
-The models are applicable for systems containing the following set of chemical elements:
-{H, B, C, N, O, F, Si, P, S, Cl, As, Se, Br, I}, both neutral and charged. The models aim to reproduce RKS B97-3c and wB97M-D3 energies.
-  
-The models are in the form of JIT-compiled PyTorch-2.0 files and could be loaded in Python or C++ code.
 
-Note, that at present models have O(N^2) compute and memory complexity w.r.t. number of atoms. They could be applied to systems up to a few 100's of atoms. Linear scaling models, with the same parametrization, will be released soon.
+## Getting Started
 
-In Python, the models could be loaded with the `torch.jit.load` function. As an input, they accept single argument of type `Dict[str, Tensor]` with the following data:
+### 1. Installation
+
+While package is in alpha stage and repository is private, please install into your conda envoronment manually with
 ```
-coords: shape (m, n, 3) - atomic coordinates in Angstrom 
-numbers: shape (m, n) - atomic numbers
-charge: shape (m, ) - total charge
-```
-Output is a dictionary with the following keys:
-```
-energy: shape (m, ) - energy in eV
-charges: shape (m, n) - partial atomic charges
-```
-## Calculators
-
-We provide example code for AIMNet2 calculators for [ASE](https://wiki.fysik.dtu.dk/ase) and [pysisyphus](https://pysisyphus.readthedocs.io/) Python libraries. The code shows an example use of the AIMNet2 models. 
-
-We also provide example geometry optimization scripts with ASE and Pysisyphus, and `pysis_mod` script which is a drop-in replacement for Pysisyphus `pysis` command-line utility, with AIMNet2 calculator enabled.
-
-## Docker image
-
-We provide an example Dockerfile to build a CPU docker image.
-
-The commands for building docker image: 
-```bash
-cd /path/to/AIMNet2 
-docker build --platform linux/amd64 --pull --rm -f "docker/Dockerfile_cpu" -t aimnet-box "."
+# install requirements
+conda install -y pytorch pytorch-cuda=12.1 -c pytorch -c nvidia 
+conda install -y -c pyg pytorch-cluster
+conda install -y -c conda-forge openbabel ase
+## pysis requirements
+conda install -y -c conda-forge autograd dask distributed h5py fabric jinja2 joblib matplotlib numpy natsort psutil pyyaml rmsd scipy sympy scikit-learn
+# now should not do any pip installs
+pip install git+https://github.com/eljost/pysisyphus.git
+# finally, this repo
+git clone git@github.com:zubatyuk/aimnet2calc.git
+cd aimnet2calc
+python setup.py install
 ```
 
-You might skip the `--platform` flag if you are building on Linux.
+### 2. Available interfaces
 
-The image exposes `aimnet2_ase_opt.py` script as entrypoint.
+#### ASE [[https://wiki.fysik.dtu.dk/ase]](https://wiki.fysik.dtu.dk/ase)
 
-Example command to run geometry optimization with docker image:
-
-```bash
-docker run -it --rm -v $(pwd):/app/ aimnet-box models/aimnet2_wb97m-d3_ens.jpt input.sdf output.sdf --charge 0 --traj output.traj
+```
+from aimnet2calc import AIMNet2ASE
+calc = AIMNet2ASE('aimnet2')
 ```
 
-Use `ase convert output.traj output.xyz` for conversion to e.g. `xyz` file format.
+To specify total molecular charge and spin multiplicity, use optional `charge` and `mult` keyword arguments, or  `set_charge` and `set_mult` methods:
 
-=======
+```
+calc = AIMNet2ASE('aimnet2', charge=1)
+atoms1.calc = calc
+# calculations on atoms1 will be done with charge 1
+....
+atoms2.calc = calc
+calc.set_charge(-2)
+# calculations on atoms1 will be done with charge -2
+```
 
-### Feedback
+#### PySisyphus [[https://pysisyphus.readthedocs.io]](https://pysisyphus.readthedocs.io/)
 
-We would appreciate it if you could share feedback about model accuracy and performance. This would be important not only for us, to guide further developments of the model, but for the broad community as well. 
-Please share your thoughts and experience, either positive or negative, by opening an issue in this repo.
+```
+from aimnet2calc import AIMNet2PySis
+calc = AIMNet2PySis('aimnet2')
+```
+
+This produces standard PySisyphus calculator.
+
+Instead of `Pysis` command line utility, use `aimnet2pysis`. This registeres AIMNet2 calculator with PySisyphus.
+Example `calc` section for PySisyphus YAML files:
+
+```
+calc:
+   type: aimnet              # use AIMNet2 calculator
+   model: aimnet2_b973c      # use aimnet2_b973c_0.jpt model
+```
+
+### 3. Base calculator
+
+```
+from aimnet2calc import AIMNet2Calculator
+```
+
+#### Initialization
+
+```
+calc = AIMNet2Calculator('aimnet2')
+```
+will load default AIMNet2 model aimnet2_wb97m_0.jpt as defined at `aimnet2calc/models.py` . If file does not exist on the machine, it will be downloaded from [aimnet-model-zoo](http://github.com/zubatyuk/aimnet-model-zoo) repository.
+
+```
+calc = AIMNet2Calculator('/path/to_a/model.jpt')
+```
+will load model from the file. 
+
+#### Input structure
+
+The calculator accepts a dictionary containig lists, numpy arrays, torch tensors, or anything that could be accepted by `torch.as_tensor`. 
+
+The input could be for a single molecule (dict keys and shapes):
+
+```
+coord: (B, N, 3)  # atomic coordinates in Angstrom
+numbers (B, N)    # atomic numbers
+charge (B,)       # molecular charge
+mult (B,)         # spin multiplicity, optional
+```
+
+or for a concatenation of molecules:
+
+```
+coord: (N, 3)  # atomic coordinates in Angstrom
+numbers (N,)    # atomic numbers
+charge (B,)    # molecular charge
+mult (B,)      # spin multiplicity, optional
+mol_idx (N,)   # molecule index for each atom, should contain integers in increasing order, with (B-1) is the maximum number.
+```
+
+where `B` is the number of molecules, `N` is number of atoms. 
+
+
+#### Calling calculator
+
+```
+results = calc(data, forces=False, stress=False, hessian=False)
+```
+
+`results` would be a dictionary of PyTorch tensors containing `energy`, `charges`, and possibly `forces`, `stress` and `hessian` if requested.
+
+### 4. Long range Coulomb model
+
+By default, Coulomb energy is calculated in O(N^2) manner, e.g. pair interaction between every pair of atoms in system. For very large or periodic systems, O(N) Dumped-Shifted Force Coulomb model could be employed [doi: 10.1063/1.2206581](https://doi.org/10.1063/1.2206581). With `AIMNet2Calculator` interface, switch between standard and DSF Coulomb implementations im AIMNet2 models:
+
+```
+# switch to O(N)
+calc.set_lrcoulomb_method('dsf', cutoff=15.0, dsf_alpha=0.2)
+# switch to O(N^2), not suitable for PBC
+calc.set_lrcoulomb_method('simple')
+```
+
+
+
+
