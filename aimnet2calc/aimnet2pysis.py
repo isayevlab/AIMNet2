@@ -18,7 +18,7 @@ class AIMNet2Pysis(Calculator):
         self.model = model
 
     def _prepere_input(self, atoms, coord):
-        device = self.base_calc.device
+        device = self.model.device
         numbers = torch.as_tensor([ATOMIC_NUMBERS[a.lower()] for a in atoms], device=device)
         coord = torch.as_tensor(coord, dtype=torch.float, device=device).view(-1, 3) * BOHR2ANG
         charge = torch.as_tensor([self.charge], dtype=torch.float, device=device)
