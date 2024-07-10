@@ -32,8 +32,10 @@ def nblist_torch_cluster(coord: Tensor, cutoff: float, mol_idx: Optional[Tensor]
     assert coord.shape[0] < 2147483646, 'Too many atoms, max supported is 2147483646'
     max_num_neighbors = max_nb
     while True:
-        sparse_nb = radius_graph(coord, batch=mol_idx, r=cutoff, max_num_neighbors=max_nb).to(torch.int32)
-        max_num_neighbors = torch.unique(sparse_nb[0], return_counts=True)[1].max().item()
+        nnb = torch.unique(sparse_nb[0], return_counts=True)[1]
+        if nnb.numel() == 0:
+            break
+        max_num_neighbors = nnb.max().item()
         if max_num_neighbors < max_nb:
             break
         max_nb *= 2
