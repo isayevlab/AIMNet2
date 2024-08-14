@@ -40,7 +40,6 @@ def nblist_torch_cluster(coord: Tensor, cutoff: float, mol_idx: Optional[Tensor]
         if max_num_neighbors < max_nb:
             break
         max_nb *= 2
-    #assert max_num_neighbors < max_nb, f'Increase max_nb in nblist_torch_cluster (current value {max_nb}, cutoff {cutoff})'   
     sparse_nb_half = sparse_nb[:, sparse_nb[0] > sparse_nb[1]]
     dense_nb = sparse_nb_to_dense_half(sparse_nb_half.mT.cpu().numpy(), coord.shape[0], max_num_neighbors)
     dense_nb = torch.as_tensor(dense_nb, device=device)

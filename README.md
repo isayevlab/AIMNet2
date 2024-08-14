@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+**__ Update 6/10/24 __**
+We release new code, suaitable for large molecules and perioric calculations. Old code available in the **old** branch. Models were re-compiled and are not compatible with the new code. 
+
+
+>>>>>>> 90a0e3a3f43955a4ff14ec70ce84c48aab5430ce
 # AIMNet2 Calculator: Fast, Accurate Molecular Simulations
 
 This package integrates the powerful AIMNet2 neural network potential into your simulation workflows. AIMNet2 provides fast and reliable energy, force, and property calculations for molecules containing a diverse range of elements.
