@@ -1,5 +1,5 @@
 **__ Update 6/10/24 __**
-We release new code, suaitable for large molecules and perioric calculations. Old code available in the **old** branch. Models were re-compiled and are not compatible with the new code. 
+We release new code, suitable for large molecules and perioric calculations. Old code available in the **old** branch. Models were re-compiled and are not compatible with the new code. 
 
 
 # AIMNet2 Calculator: Fast, Accurate Molecular Simulations
@@ -34,6 +34,51 @@ python setup.py install
 ```
 
 ### 2. Available interfaces
+
+#### MLatom [[https://github.com/dralgroup/mlatom]](https://github.com/dralgroup/mlatom)
+
+AIMNet2 is available in MLatom (general-purpose package for AI-enhanced computational chemistry) and can also be run in the web interface on https://XACScloud.com (no installation needed).
+
+Sample input file for MLatom calculations:
+
+```
+AIMNet2@wb97m-d3
+geomopt
+xyzfile='
+2
+
+H    0.000000    0.000000    0.363008
+H    0.000000    0.000000   -0.363008
+5
+
+C    0.000000    0.000000    0.000000
+H    0.627580    0.627580    0.627580
+H   -0.627580   -0.627580    0.627580
+H    0.627580   -0.627580   -0.627580
+H   -0.627580    0.627580   -0.627580
+'
+```
+
+and via Python scripts:
+
+```
+import mlatom as ml
+# read molecule from .xyz file
+molDB = ml.data.molecular_database.from_xyz_file('sp.xyz')
+
+# define method
+method = mlatom.models.methods(method='AIMNet2@wb97m-d3')
+
+method.predict(
+    molecular_database=molDB,
+    calculate_energy=True,
+    calculate_energy_gradients=True,
+    calculate_hessian=True)
+
+print(f'Energy in Hartree for molecule 0: {molDB[0].energy}')
+print(f'Gradients in Hartree/Angstrom for molecule 1: {molDB[1].get_energy_gradients()}')
+print(f'Hessian in Hartree/Angstrom^-2 for molecule 1: {molDB[1].hessian})
+```
 
 #### ASE [[https://wiki.fysik.dtu.dk/ase]](https://wiki.fysik.dtu.dk/ase)
 
