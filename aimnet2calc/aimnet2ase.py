@@ -14,15 +14,15 @@ class AIMNet2ASE(Calculator):
         self.base_calc = base_calc
         self.charge = charge
         self.mult = mult
-        self.do_reset()
+        self.reset()
         # list of implemented species
         if hasattr(base_calc, 'implemented_species'):
             self.implemented_species = base_calc.implemented_species.cpu().numpy()
         else:
             self.implemented_species = None
-        
 
-    def do_reset(self):
+    def reset(self):
+        super().reset()
         self._t_numbers = None
         self._t_charge = None
         self._t_mult = None
@@ -33,16 +33,20 @@ class AIMNet2ASE(Calculator):
     def set_atoms(self, atoms):
         if self.implemented_species is not None and not np.in1d(atoms.numbers, self.implemented_species).all():
             raise ValueError('Some species are not implemented in the AIMNet2Calculator')
+        self.reset()
         self.atoms = atoms
-        self.do_reset()
 
     def set_charge(self, charge):
         self.charge = charge
+        self._t_charge = None
+        self.update_tensors()
 
     def set_mult(self, mult):
         self.mult = mult
+        self._t_mult = None
+        self.update_tensors()
 
-    def uptade_tensors(self):
+    def update_tensors(self):
         if self._t_numbers is None:
             self._t_numbers = torch.tensor(self.atoms.numbers, dtype=torch.int64, device=self.base_calc.device)
         if self._t_charge is None:
@@ -54,7 +58,7 @@ class AIMNet2ASE(Calculator):
 
     def calculate(self, atoms=None, properties=['energy'], system_changes=all_changes):
         super().calculate(atoms, properties, system_changes)
-        self.uptade_tensors()
+        self.update_tensors()
 
         if self.atoms.cell is not None and self.atoms.pbc.any():
             #assert self.base_calc.cutoff_lr < float('inf'), 'Long-range cutoff must be finite for PBC'
@@ -79,4 +83,3 @@ class AIMNet2ASE(Calculator):
             self.results['forces'] = results['forces']
         if 'stress' in properties:
             self.results['stress'] = results['stress']
-
