@@ -1,12 +1,14 @@
-from ase.calculators.calculator import Calculator, all_changes
-from aimnet2calc import AIMNet2Calculator
 from typing import Union
-import torch
+
 import numpy as np
+import torch
+from ase.calculators.calculator import Calculator, all_changes
+
+from aimnet2calc.calculator import AIMNet2Calculator
 
 
 class AIMNet2ASE(Calculator):
-    implemented_properties = ['energy', 'forces', 'free_energy', 'charges', 'stress']
+    implemented_properties = ['energy', 'forces', 'free_energy', 'charges', 'stress', 'dipole_moment']
     def __init__(self, base_calc: Union[AIMNet2Calculator, str] = 'aimnet2', charge=0, mult=1):
         super().__init__()
         if isinstance(base_calc, str):
@@ -56,6 +58,12 @@ class AIMNet2ASE(Calculator):
         if self._t_mol_idx is None:
             self.mol_idx = torch.zeros(len(self.atoms), dtype=torch.int64, device=self.base_calc.device)
 
+    def get_dipole_moment(self,atoms):
+        charges = self.get_charges()[:, np.newaxis]
+        positions = atoms.get_positions()
+        return np.sum(charges * positions, axis=0)
+
+
     def calculate(self, atoms=None, properties=['energy'], system_changes=all_changes):
         super().calculate(atoms, properties, system_changes)
         self.update_tensors()
@@ -77,8 +85,10 @@ class AIMNet2ASE(Calculator):
         for k, v in results.items():
             results[k] = v.detach().cpu().numpy()
 
-        self.results['energy'] = results['energy']
+        self.results['energy'] = results['energy'].item()
         self.results['charges'] = results['charges']
+        self.results['dipole_moment'] = self.get_dipole_moment(self.atoms)
+
         if 'forces' in properties:
             self.results['forces'] = results['forces']
         if 'stress' in properties:

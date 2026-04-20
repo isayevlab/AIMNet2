@@ -134,12 +134,12 @@ def _nblist_pbc_cuda(conn_mat, shifts):
     return idx_j, mat_pad, shifts[S_idx]
 
 
-def _nblist_pbc_cpu(conn_mat, shifts, device):
+def _nblist_pbc_cpu(conn_mat, shifts):
     conn_mat = conn_mat.cpu().numpy()
     mat_idxj, mat_pad, mat_S_idx = _cpu_dense_nb_mat_sft(conn_mat)
-    mat_idxj = torch.from_numpy(mat_idxj).to(device)
-    mat_pad = torch.from_numpy(mat_pad).to(device)
-    mat_S_idx = torch.from_numpy(mat_S_idx).to(device)
+    mat_idxj = torch.from_numpy(mat_idxj)
+    mat_pad = torch.from_numpy(mat_pad)
+    mat_S_idx = torch.from_numpy(mat_S_idx)
     mat_S = shifts[mat_S_idx]
     return mat_idxj, mat_pad, mat_S
 

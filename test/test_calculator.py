@@ -1,8 +1,9 @@
-import ase.io
-from aimnet2calc.calculator import AIMNet2Calculator
 import os
+
+import ase.io
 import numpy as np
 
+from aimnet2calc.calculator import AIMNet2Calculator
 
 MODELS = ('aimnet2', 'aimnet2_b973c')
 DIR = os.path.dirname(__file__)
