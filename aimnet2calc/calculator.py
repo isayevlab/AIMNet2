@@ -1,8 +1,9 @@
 import torch
 from torch import nn, Tensor
 from typing import Union, Dict, Any
-from aimnet2calc.nblist import nblist_torch_cluster, nblists_torch_pbc
+from aimnet2calc.nblist import calc_nbmat_dual, calc_nbmat_pbc
 from aimnet2calc.models import get_model_path
+import warnings
 
 
 class AIMNet2Calculator:
@@ -42,6 +43,7 @@ class AIMNet2Calculator:
         self.cutoff = self.model.cutoff
         self.lr = hasattr(self.model, 'cutoff_lr')
         self.cutoff_lr = getattr(self.model, 'cutoff_lr', float('inf'))
+        self.max_density = 0.2
 
         # indicator if input was flattened
         self._batch = None
@@ -54,7 +56,7 @@ class AIMNet2Calculator:
             self._coulomb_method = coul_methods.pop()
         else:
             self._coulomb_method = None
-
+        
     def __call__(self, *args, **kwargs):
         return self.eval(*args, **kwargs)
 
@@ -93,7 +95,7 @@ class AIMNet2Calculator:
             if data['mol_idx'][-1] > 0:
                 raise NotImplementedError('PBC with multiple molecules is not implemented yet.')
             if self._coulomb_method == 'simple':
-                print('Switching to DSF Coulomb for PBC')
+                warnings.warn('Switching to DSF Coulomb for PBC')
                 self.set_lrcoulomb_method('dsf')
         data = self.make_nbmat(data)
         data = self.pad_input(data)
@@ -133,7 +135,7 @@ class AIMNet2Calculator:
         else:
             self._batch = None
             if 'mol_idx' not in data:
-                data['mol_idx'] = torch.zeros(data['coord'].shape[0], device=self.device)
+                data['mol_idx'] = torch.zeros(data['coord'].shape[0], dtype=torch.long, device=self.device)
         return data
     
     def mol_unflatten(self, data: Dict[str, Tensor], batch=None) -> Dict[str, Tensor]:
@@ -147,22 +149,54 @@ class AIMNet2Calculator:
     def make_nbmat(self, data: Dict[str, Tensor]) -> Dict[str, Tensor]:
         if 'cell' in data and data['cell'] is not None:
             assert data['cell'].ndim == 2, 'Expected 2D tensor for cell'
-            if 'nbmat' not in data:
-                data['coord'] = move_coord_to_cell(data['coord'], data['cell'])
-                mat_idxj, mat_pad, mat_S = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff)
-                data['nbmat'], data['nb_pad_mask'], data['shifts'] = mat_idxj, mat_pad, mat_S
-                if self.lr:
-                    if 'nbmat_lr' not in data:
-                        assert self.cutoff_lr < torch.inf, 'Long-range cutoff must be finite for PBC'
-                        data['nbmat_lr'], data['nb_pad_mask_lr'], data['shifts_lr'] = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff_lr)
-                        data['cutoff_lr'] = torch.tensor(self.cutoff_lr, device=self.device)
-        else:
-            if 'nbmat' not in data:
-                data['nbmat'] = nblist_torch_cluster(data['coord'], self.cutoff, data['mol_idx'], max_nb=128)
-                if self.lr:
-                    if 'nbmat_lr' not in data:
-                        data['nbmat_lr'] = nblist_torch_cluster(data['coord'], self.cutoff_lr, data['mol_idx'], max_nb=1024)
+            data['coord'] = move_coord_to_cell(data['coord'], data['cell'])
+            while True:
+                try:
+                    maxnb = int(self.max_density * 4/3 * 3.14159 * self.cutoff ** 3)
+                    mat_idxj, mat_S = calc_nbmat_pbc(data['coord'], data['cell'], self.cutoff, maxnb)
+                    mat_pad = mat_idxj == data['coord'].shape[0]
+                    data['nbmat'], data['nb_pad_mask'], data['shifts'] = mat_idxj, mat_pad, mat_S
+                    break
+                except ValueError:
+                    self.max_density *= 1.5
+            if self.lr:
+                assert self.cutoff_lr < torch.inf, 'Long-range cutoff must be finite for PBC'
+            while True:
+                try:
+                    maxnb = int(self.max_density * 4/3 * 3.14159 * self.cutoff_lr ** 3)                    
+                    mat_idxj, mat_S = calc_nbmat_pbc(data['coord'], data['cell'], self.cutoff_lr, maxnb)
+                    mat_pad = mat_idxj == data['coord'].shape[0]
+                    data['nbmat_lr'], data['nb_pad_mask_lr'], data['shifts_lr'] = mat_idxj, mat_pad, mat_S
                     data['cutoff_lr'] = torch.tensor(self.cutoff_lr, device=self.device)
+                    break
+                except ValueError:
+                    self.max_density *= 1.5
+        else:
+            while True:
+                try:
+                    cutoff1 = self.cutoff
+                    maxnb1 = int(self.max_density * 4/3 * 3.14159 * cutoff1 ** 3)
+                    if self.lr:
+                        cutoff2 = self.cutoff_lr
+                        if cutoff2 == float('inf'):
+                            maxnb2 = data['coord'].shape[0] - 1
+                        else:
+                            maxnb2 = int(self.max_density * 4/3 * 3.14159 * cutoff2 ** 3)
+                    else:
+                        cutoff2 = None
+                        maxnb2 = None
+                    maxnb1 = min(maxnb1, data['coord'].shape[0] - 1)
+                    maxnb2 = min(maxnb2, data['coord'].shape[0] - 1)
+                    nbmat1, nbmat2 = calc_nbmat_dual(data['coord'].contiguous(), (cutoff1, cutoff2), (maxnb1, maxnb2), data.get('mol_idx').contiguous())
+                    data['nbmat'] = nbmat1
+                    if self.lr:
+                        data['nbmat_lr'] = nbmat2
+                        data['cutoff_lr'] = torch.tensor(cutoff2, device=self.device)
+                    break
+
+                except ValueError:
+                    self.max_density *= 1.5
+                
         return data
     
     def pad_input(self, data: Dict[str, Tensor]) -> Dict[str, Tensor]:
