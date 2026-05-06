@@ -29,7 +29,7 @@ class AIMNet2Calculator:
     keys_out = ['energy', 'charges', 'forces', 'hessian', 'stress']
     atom_feature_keys = ['coord', 'numbers', 'charges', 'forces']
     
-    def __init__(self, model: Union[str, torch.nn.Module] = 'aimnet2'):
+    def __init__(self, model: Union[str, torch.nn.Module] = 'aimnet2', max_nb_lr_guess=1024):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         if isinstance(model, str):
             p = get_model_path(model)
@@ -42,6 +42,7 @@ class AIMNet2Calculator:
         self.cutoff = self.model.cutoff
         self.lr = hasattr(self.model, 'cutoff_lr')
         self.cutoff_lr = getattr(self.model, 'cutoff_lr', float('inf'))
+        self.max_nb_lr_guess=max_nb_lr_guess
 
         # indicator if input was flattened
         self._batch = None
@@ -149,12 +150,16 @@ class AIMNet2Calculator:
             assert data['cell'].ndim == 2, 'Expected 2D tensor for cell'
             if 'nbmat' not in data:
                 data['coord'] = move_coord_to_cell(data['coord'], data['cell'])
-                mat_idxj, mat_pad, mat_S = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff)
+                mat_idxj, mat_pad, mat_S = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff, max_nb=128)
                 data['nbmat'], data['nb_pad_mask'], data['shifts'] = mat_idxj, mat_pad, mat_S
                 if self.lr:
                     if 'nbmat_lr' not in data:
                         assert self.cutoff_lr < torch.inf, 'Long-range cutoff must be finite for PBC'
-                        data['nbmat_lr'], data['nb_pad_mask_lr'], data['shifts_lr'] = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff_lr)
+                        data['nbmat_lr'], data['nb_pad_mask_lr'], data['shifts_lr'] = nblists_torch_pbc(data['coord'], data['cell'], self.cutoff_lr,
+                                                                                                        max_nb=self.max_nb_lr_guess)
+                        max_nb = torch.sum(data['nb_pad_mask_lr'], axis=1).max()
+                        if max_nb > self.max_nb_lr_guess:
+                            self.max_nb_lr_guess = int(max_nb * 1.05)
                         data['cutoff_lr'] = torch.tensor(self.cutoff_lr, device=self.device)
         else:
             if 'nbmat' not in data:
